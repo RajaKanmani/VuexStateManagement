@@ -21,13 +21,13 @@
          </div>
       </nav>
    </div>
-   <div class="content">
+   <div class="content"  style="padding:15px;">
       <div class="row"  v-if="user_role === 'admin'">
          <div class="col-lg-3">
             <div class="hpanel hyellow">
                <div class="panel-body    text-center h-200">
                   <i class="pe-7s-graph1 fa-4x"></i>
-                  <h1 class="m-xs count">{{project_count}}</h1>
+                  <h1 class="m-xs count">{{getProjectCount}}</h1>
                   <h3 class="font-extra-bold no-margins text-dashboard">
                      Total  Projects
                   </h3>
@@ -66,7 +66,7 @@
                      <i class="pe-7s-box2 fa-4x"></i>
                   </div>
                   <div class="m-t-xl">
-                     <h1 class="count_task text-dashboard">{{task_count}}</h1>
+                     <h1 class="count_task text-dashboard">{{getTask_count.taskcount}}</h1>
                   </div>
                </div>
                <div class="panel-footer">
@@ -94,11 +94,11 @@
                      <div class="row">
                         <div class="col-xs-5">
                            <small class="stat-label">Completed</small>
-                           <h4 class="complete_count text-dashboard">{{complete_count}}</h4>
+                           <h4 class="complete_count text-dashboard">{{getTask_count.complete_count}}</h4>
                         </div>
                         <div class="col-xs-7">
                            <small class="stat-label">Pending</small>
-                           <h4 class="un_complete_count text-dashboard">{{un_complete_count}}</h4>
+                           <h4 class="un_complete_count text-dashboard">{{getTask_count.un_complete_count}}</h4>
                         </div>
                      </div>
                   </div>
@@ -110,10 +110,18 @@
          </div>
       </div>
    </div>
-   <div class="content">
+   <div class="content"  style="padding: 0px;">
       <div class="section_homes">
+         <!-- <div class="col-md-4">
+            <div class ="input-group">
+                 <input class="form-control" type="text" v-model="search" placeholder="Search projects..">
+                 <div class="input-group-btn">
+                    <button class="btn btn-default"><i class="fa fa-search"></i></button>
+                 </div>
+              </div>
+            </div> -->
          <div class="panel-body">
-            <div class="col-lg-12">
+            <div class="col-lg-12" style="padding: 0px;">
                <div class="hpanel">
                   <ul class="nav nav-tabs">
                      <li  class=""  @click="tab_one()"><a data-toggle="tab" aria-expanded="true">Projects</a></li>
@@ -130,12 +138,13 @@
                         </div>
                         <div class="panel-body" >
                            <div class="row projects btn_view" style="margin-top: 21px;">
-                              <div class="col-lg-4" id="click_section"  v-for="list in projects_list.data" v-bind:key="list.id">
-                                 <div class="hpanel box-dashboard">
+                              <div class="col-lg-4" id="click_section"  v-for="list in getProjectList.data" v-bind:key="list.id">
+                                 <div class="hpanel  hblue">
+                                    <!-- <div  class="total_task"><p>Tasks</p><b>{{list.total_task}}</b></div> -->
                                     <div class="panel-body">
                                        <div class="row">
                                           <router-link :to="{ name: 'task',  params: { id: list.id } }">
-                                             <div class="col-sm-12">
+                                             <div class="col-sm-12" style="padding:0px;">
                                                 <div class="row">
                                                    <div class="col-sm-12">
                                                       <div class="project-label">{{list.title}}</div>
@@ -145,6 +154,22 @@
                                                 <p>
                                                    {{list.description}}
                                                 </p>
+                                             </div>
+                                             <div class="project_details">
+                                                <div class="col-sm-3">
+                                                   <div class="project-label">TASKS</div>
+                                                   <small>{{list.total_task}}</small>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                   <div class="project-label">COLLABORATOR</div>
+                                                   <small>{{list.collaborators_count}}</small>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                   <div class="project-label">DEDLINE</div>
+                                                   <small>12.06.2015</small>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                </div>
                                              </div>
                                           </router-link>
                                           <div class="col-sm-12 project-info">
@@ -191,14 +216,14 @@
                                        </tr>
                                     </thead>
                                     <tbody>
-                                       <tr  v-for="list in customers_list.data"  v-bind:key="list.id">
-                                          <td>{{list.name}}</td>
+                                       <tr  v-for="list in getCustomerList.data"  v-bind:key="list.id">
+                                          <td style="position: relative;"><p v-if="list.is_active =='1'" class="online_status"></p>{{list.name}}</td>
                                           <td>{{list.email}}</td>
                                           <td><strong>{{list.projectCount}}</strong></td>
                                           <td>
                                              <a @click="customer_view(list.id)"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                              &nbsp;&nbsp;&nbsp;
-                                             <a @click="delete_coustmer(list.id)"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                             <a @click="delete_customer(list.id)"><i class="fa fa-trash" aria-hidden="true"></i></a>
                                           </td>
                                        </tr>
                                     </tbody>
@@ -206,6 +231,7 @@
                               </div>
                            </div>
                         </div>
+                   
                      </div>
                   </div>
                </div>
@@ -213,12 +239,13 @@
          </div>
       </div>
    </div>
+
    <div class="modal_boxs fade in" v-if="addprojectModel">
       <div class="modal-dialog">
          <!-- Modal content-->
          <div class="modal-content">
             <div class="modal-header">
-               <button type="button" class="close addproject"   @click="addprojectModel = false" >&times;</button>
+               <button type="button" class="close addproject"   @click="addprojectModel = false " >&times;</button>
                <h4 class="modal-title">Add Project</h4>
             </div>
             <div class="modal-body">
@@ -241,7 +268,7 @@
                      <div class="col-sm-10">
                         <select  v-model="customer_id" class="form-control m-b js-source-states-2" name="customer_id[]" multiple="multiple">
                            <option value="">Select Customes</option>
-                           <option v-for="list in customers_list.data"  v-bind:value="list.id" v-bind:key="list.id">{{list.name}}</option>
+                           <option v-for="list in getCustomerList.data"  v-bind:value="list.id" v-bind:key="list.id">{{list.name}}</option>
                         </select>
                      </div>
                   </div>
@@ -265,7 +292,7 @@
          <!-- Modal content-->
          <div class="modal-content">
             <div class="modal-header">
-               <button type="button" class="close addcustomer"  @click ="custmerModel = false"  data-dismiss="modal">×</button>
+               <button type="button" class="close addcustomer"  @click ="custmerModel = false , updatecustomerButton = false ,customerButton = true"  data-dismiss="modal">×</button>
                <h4 class="modal-title">Add Customer</h4>
             </div>
             <div class="modal-body">
@@ -309,30 +336,33 @@
          </div>
       </div>
    </div>
+ <!-- <li v-for="cat in getTask_count" :key="cat.id">
+        {{cat.id}}
+    </li> -->
 </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import {mapGetters,mapActions}  from 'vuex';
 
 export default {
    name:'app',
+   computed:{
+           ...mapGetters(['getTask_count','getProjectList','getProjectCount','getCustomerList'])
+      },
    data(){
       return {
           username:sessionStorage.getItem('name'),
           Authorization:{ 'Authorization': 'Bearer  ' +sessionStorage.getItem('token')},
-          project_count:'',
+          user_role:sessionStorage.getItem('role'),
+          user_id:sessionStorage.getItem('user_id'),
           customer_count:'',
-          complete_count:'',
-          task_count:'',
-          un_complete_count:'',
-          projects_list:'',
           customers_list:'',
           title:'',
           description:'',
           customer_id:[],
-          isActive:"tab_1",
-          user_role:sessionStorage.getItem('role'),
+          isActive:'tab_1',
           project_id:'',
           addprojectModel: false,
           addprojectButton:true,
@@ -345,214 +375,151 @@ export default {
           customerButton:true,
           updatecustomerButton:false,
           error:false,
-
+          password_error: false,
       }
    },
-   methods:{
-      logout(){
 
-            sessionStorage.clear();
-            this.$router.push('/');
-       },
-      tab_one(){
-
-          this.isActive = 'tab_1';
-      },
-       tab_two(){
-
-          this.isActive = 'tab_2';
-      },
-     
-      delete_project(id){
-
-          axios.delete('http://127.0.0.1:8000/api/projects/' + id, {
-                    headers:this.Authorization,
-                })
-                .then((response) => {
-                    location.reload(true);
-                })
-      },
-      add_project(){
-   
-            let url = 'http://127.0.0.1:8000/api/projects';
-            let data = { 
-              "title": this.title,
-              "description":this.description,
-              "customer_id":this.customer_id
-            }
-            axios.post(url,data,{
-                  headers:this.Authorization,
-            })
-            .then((response) => {
-
-               location.reload(true);  
-            })
-            .catch(error => {
-                console.log(error)
-            })
-        },
-
-        update_view(id){
-
-            this.addprojectModel = true,
-            this.addprojectButton = false;
-            this.updateprojectButton = true;
-            axios.get('http://127.0.0.1:8000/api/projects/' + id, {
-                headers:this.Authorization,
-            })
-            .then((response) => {
-                 this.title = response.data.data['title'],
-                 this.description = response.data.data['description'],
-                 this.project_id = response.data.data['id']
-           
-            })
-        },
-        update_project(id){
-
-            let url = 'http://127.0.0.1:8000/api/projects/'+ id;
-            let data = { 
-                "title": this.title,
-                "description":this.description,
-                "customer_id":this.customer_id
-             }
-            axios.put(url,data,{
-                  headers:this.Authorization,
-            })
-            .then((response) => {
-                location.reload(true);   
-            })
-            .catch(error => {
-                console.log(error);
-
-            })
-
-        },
-
-        add_customer(){
-
-              let url = 'http://127.0.0.1:8000/api/customers';
-
-              if(this.customer_password.length == 8){
-                  
-                    let data = { 
-                        "name": this.customer_name,
-                        "email":this.customer_email,
-                        "password":this.customer_password
-                    }
-                    axios.post(url,data,{
-                        headers:this.Authorization,
-                    })
-                    .then((response) => {
-
-                       location.reload(true); 
-                        
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        this.custmerModel = true;
-                    })
-            }
-
-            else{
-
-                this.error =true
-            }
-         
-            
-        },
-
-      customer_view(id){
-
-            this.custmerModel = true;
-            this.updatecustomerButton = true,
-            this.customerButton = false,
-            axios.get('http://127.0.0.1:8000/api/customers/' + id, {
-                headers:this.Authorization,
-            })
-            .then((response) => {
-                 this.customer_name = response.data.data['name'],
-                 this.customer_email = response.data.data['email'],
-                 this.customerupdate_id = response.data.data['id']
-           
-            })
-        },
-       update_customer(id){
-
-            let url = 'http://127.0.0.1:8000/api/customers/'+ id;
-            let data = { 
-                "name": this.customer_name,
-                "email":this.customer_email
-            }
-            axios.put(url,data,{
-                  headers:this.Authorization,
-            })
-            .then((response) => {
-                location.reload(true);   
-            })
-            .catch(error => {
-                console.log(error);
-
-            })
-
-        },
-
-        
-      delete_coustmer(id){
-          axios.delete('http://127.0.0.1:8000/api/customers/' + id, {
-                    headers:this.Authorization,
-                })
-                .then((response) => {
-                    location.reload(true);
-                })
-           },
-
-    },
+   methods:
+   {
+      ...mapActions([
+            'task_status', 'get_project_list',  'get_project_count',  'get_customer_list',  'Add_Project',  'Delete_Project',
+            'Update_Project', 'Add_Customer', 'Delete_Customer', 'Update_Customer'  ]),
  
-   mounted(){
-      let get_token = sessionStorage.getItem('token');
+   add_project() {
+      let data = { "title": this.title,  "description": this.description, "customer_id": this.customer_id};
+      this.$store.dispatch('Add_Project', data).then(()=>{
+         this.addprojectModel = false
+         this.title = '',
+         this.description = '',
+         this.project_id = ''
+         this.task_status();
+         this.get_project_count();
+         this.get_customer_list();
+      })    
+   },
 
-      if(get_token==null){
+   update_project(id) {
+      let data = {"id":id,"title": this.title,  "description": this.description, "customer_id": this.customer_id};
+      this.$store.dispatch('Update_Project', data).then(()=>{
+         this.addprojectModel = false
+         this.title = '',
+         this.description = '',
+         this.project_id = ''
+         this.task_status();
+         this.get_project_count();
+         this.get_customer_list();
+      })   
+   },
 
+   add_customer() {
+       this.customerButton = true
+       if (this.customer_password.length == 8) {
+           let data = {"name": this.customer_name,"email": this.customer_email, "password": this.customer_password};
+           this.$store.dispatch('Add_Customer',data).then(()=>{
+               this.custmerModel = false
+               this.customer_name = '',
+               this.customer_email = '',
+               this.customer_password = ''  
+           })
+       }
+        else {
+          this.error = true
+       }
+   },
+   
+   update_view(id) {
+      this.addprojectModel = true,
+      this.addprojectButton = false;
+      this.updateprojectButton = true;
+       axios.get('http://127.0.0.1:8000/api/projects/' + id, {
+         headers: this.Authorization,
+        })
+        .then((response) => {
+         this.title = response.data.data['title'],
+          this.description = response.data.data['description'],
+          this.project_id = response.data.data['id']
+
+        })
+   },
+              
+   delete_project(id) {
+      this.$store.dispatch('Delete_Project', id)
+      this.task_status();
+      this.get_project_count();
+      this.get_customer_list();
+   },
+
+
+   delete_customer(id) {
+        this.$store.dispatch('Delete_Customer', id)
+        this.task_status();
+        this.get_project_count();
+        this.get_customer_list();
+   },
+
+   customer_view(id) {
+        this.custmerModel = true;
+        this.updatecustomerButton = true,
+        this.customerButton = false,
+        axios.get('http://127.0.0.1:8000/api/customers/' + id, {
+          headers: this.Authorization,
+        })
+        .then((response) => {
+           this.customer_name = response.data.data['name'],
+           this.customer_email = response.data.data['email'],
+           this.customerupdate_id = response.data.data['id']
+
+        })
+      },
+
+   update_customer(id){
+      let data = {"id":id,"name": this.customer_name,"email": this.customer_email};
+      this.$store.dispatch('Update_Customer',data).then(()=>{
+           this.custmerModel = false,
+           this.customer_name = '',
+           this.customer_email = ''
+      })
+
+   },
+         
+   logout() {
+     axios.get('http://127.0.0.1:8000/api/logout/' + this.user_id, {
+            headers: this.Authorization,
+       })
+       .then((response) => {
+         sessionStorage.clear();
          this.$router.push('/');
-      }
-  
-         axios.get('http://127.0.0.1:8000/api/projects', {
-                headers:this.Authorization,
-            })
-            .then((response) => {
-                this.projects_list = response.data
-        })
+      })
+    },
 
-         axios.get('http://127.0.0.1:8000/api/customers', {
-                headers:this.Authorization,
-            })
-            .then((response) => {
-                this.customers_list = response.data
-        })
+   tab_one() {
+      this.isActive = 'tab_1';
+   },
 
-         axios.get('http://127.0.0.1:8000/api/projectCount', {
-                headers:this.Authorization,
-            })
-            .then((response) => {
-                this.project_count = response.data;
-        })
+   tab_two() {
+      this.isActive = 'tab_2';
+   },
 
-          axios.get('http://127.0.0.1:8000/api/customerCount', {
-                headers:this.Authorization,
-            })
-            .then((response) => {
-                this.customer_count = response.data;
-        })
+},
 
-         axios.get('http://127.0.0.1:8000/api/taskCount', {
-                headers:this.Authorization,
-            })
-            .then((response) => {
-                this.task_count = response.data['taskcount'];
-                this.complete_count = response.data['complete_count'];
-                this.un_complete_count = response.data['un_complete_count'];
+     
+   mounted(){
+       this.task_status();
+       this.get_project_list();
+       this.get_project_count();
+       this.get_customer_list();
+       let get_token = sessionStorage.getItem('token');
+       if (get_token == null) {
+         this.$router.push('/');
+       }
+
+      axios.get('http://127.0.0.1:8000/api/customerCount', {
+           headers: this.Authorization,
         })
+        .then((response) => {
+            this.customer_count = response.data;
+        })
+   },
       
-   }
-}
+ }
 </script>
