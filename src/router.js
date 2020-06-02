@@ -5,9 +5,6 @@ import Task from './components/task.vue'
 import Taskview from './components/taskview.vue'
 import Notes from './components/notes.vue'
 
-
-
-
 function authcheck(to, from, next){
     let get_token = sessionStorage.getItem('token');
     if(get_token){
