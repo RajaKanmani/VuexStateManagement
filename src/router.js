@@ -18,11 +18,6 @@ function authcheck(to, from, next){
     }
 }
 
-
-
-
-
-
 const routes = [
 
     { 
